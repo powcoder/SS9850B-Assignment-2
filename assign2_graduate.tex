@@ -1,0 +1,186 @@
+\documentclass[11pt]{article}
+\setlength{\topmargin}{-.5in}
+\setlength{\textheight}{9in}
+\setlength{\oddsidemargin}{-.25in}
+\setlength{\textwidth}{6.5in}
+\usepackage[all]{xy}
+\newcommand{\Var}{\mbox{Var}}
+\newcommand{\hsp}{\hspace}
+ \setlength{\baselineskip}{1.9em}
+ \linespread{1.16}
+ \usepackage{color,amssymb,epsfig,verbatim,amsmath}
+\usepackage{listings}
+
+\begin{document}
+
+\hfill Instructor: L.-P. Chen
+
+\begin{center}
+\Large{\bf SS9850B Assignment \#2 
+\\(Due April 3 2020)}
+\end{center}
+
+{\bf Please carefully read the following instructions:}
+
+\begin{itemize}
+
+\item {\bf There are 3 questions in this assignment. 4 marks for each subquestion.}
+
+\item  {\bf Show all your works in details and provide your code for computations. Also, well summarize your numerical results in each question.}
+
+\item {\bf This assignment is an INDIVIDUAL work. Plagiarism will earn ZERO mark.}
+
+\item {\bf ONLY R functions/packages mentioned in this course are allowed.  Using other functions/packages that are not used in this course will lose marks.}
+
+
+\item {\bf Submit your solutions to the Drop Box in the course site. Delayed submission will lose marks.}
+
+%\item {\bf Please submit your hard copy in class.}
+\end{itemize}
+
+\clearpage
+
+
+
+\begin{enumerate}
+
+\item {\bf (Wine Data Set)} These data are the results of a chemical analysis of wines grown in the same region in Italy but derived from three different cultivars. The analysis determined the quantities of 13 constituents (including  {\tt Alcohol}, {\tt Malic acid}, {\tt Ash}, {\tt Alcalinity of ash}, {\tt Magnesium}, {\tt Total phenols}, {\tt Flavanoids}, {\tt Nonflavanoid phenols}, {\tt Proanthocyanins}, {\tt Color intensity}, {\tt Hue,OD280/OD315 of diluted wines}, and {\tt Proline}) found in each of the three types of wines. The sample size is 178. The dataset is available in the course site. The main interest of this dataset is to study multiclassification of the three types of wines. Let $\widehat{y}$ denote the predicted class of observations.
+
+\begin{itemize}
+
+\item[(a)] Instead of estimating $\Sigma$ (or $\Sigma_i$) by empirical estimates and then take an inverse, here we consider to use glasso to estimate $\Theta \triangleq \Sigma^{-1}$ (or $\Theta_i \triangleq \Sigma_i^{-1}$) directly. After that, replacing the estimator $\widehat{\Theta}$ (or $\widehat{\Theta}_i$) to the linear discriminant function (or quadratic discriminant function) gives {\it graphical-based } linear discriminant analysis (or quadratic discriminant analysis). In this question, use the graphical-based linear discriminant analysis and quadratic discriminant analysis to obtain $\widehat{y}$. In addition, summarize the confusion table for $y$ and $\widehat{y}$, use macro averaged metrics to evaluate recall, precision, F-measure, and then conduct performance of classification.
+
+\item[(b)] Use the support vector machine method to obtain $\widehat{y}$. In addition, summarize the confusion table for $y$ and $\widehat{y}$, use macro averaged metrics to evaluate recall, precision, F-measure, and then conduct performance of classification.
+
+%graduate students
+\item[(c)] Suppose that we only consider the predictor {\tt Proline}. Use the nonparametric density estimation method in Section~4.1 to explore the multiclassification. For the choices of kernel function, we examine the {\it Gaussian kernel} and the {\it biweight kernel}; for the bandwidth selection, we use the {\it cross-validation} (CV) method.
+
+After obtaining $\widehat{y}$, summarize the confusion table for $y$ and $\widehat{y}$, use macro averaged metrics to evaluate recall, precision, F-measure, and then conduct performance of classification. 
+
+\begin{lstlisting}[language=R]
+## Hint: programming code of CV function:
+
+J=function(h){
+fhat=Vectorize(function(x) density(X,from=x,to=x,n=1,bw=h)$y)
+fhati=Vectorize(function(i) density(X[-i],from=X[i],to=X[i],n=1,bw=h)$y)
+F=fhati(1:length(X))
+return(integrate(function(x) fhat(x)^2,-Inf,Inf)$value-2*mean(F))
+}
+
+\end{lstlisting}
+
+\item[(d)] Summarize your findings in (a)-(c).
+
+\end{itemize}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\clearpage
+
+\item {\bf (Simulation studies)} Consider the following linear model:
+\begin{eqnarray} \label{lm}
+y = X_1 \beta_1 + X_2 \beta_2 + X_3 \beta_3 + X_5 \beta_5 - 5\sqrt{\rho} X_6 \beta_6 + X_7 \beta_7 + \epsilon,
+\end{eqnarray}
+where $X = \left( X_1,\cdots,X_p \right)$ is a $p$-dimensional vector of covariates and each $X_k$ is generated from $N(0,1)$. The correlations of all $X_k$ except $X_6$ are $\rho$, while $X_6$ has the correlation $\sqrt{\rho}$ with all other $p-1$ variables. Suppose that the sample size is $n=200$.
+
+\begin{itemize}
+
+\item[(a)] Show that $X_6$ is marginally independent of $y$.
+
+
+\item[(b)] Now, consider $p=1000$ and generate the artificial data based on model (\ref{lm}) for 1000 repetitions. Specifically, let $\beta_i=1$ for every $i=1,\cdots,7$ and set $\rho=0.8$. After that, use the SIS and iterated SIS methods to do variable selection and estimate the parameters associated with selected covariates. Finally, summarize the estimator in the following table:
+
+\begin{table}[!ht]
+       \huge
+     \caption{Simulation result for (b)}
+
+   \scriptsize
+
+ \centering
+  \renewcommand{\arraystretch}{0.9}
+ \begin{tabular}{c c c c c}
+ \\
+ \hline
+& $\|\Delta\beta\|_1$ & $\|\Delta\beta\|_2$ & \#S & \#FN \\
+\hline
+SIS & \\
+Iterated SIS & \\ 
+ \hline 
+\end{tabular}
+
+\end{table}
+
+
+\item[(c)] Here we consider the scenario that is different from (b). Let $p=50$ and $X \sim N(0,\Sigma_X)$ with entry $(j,k)$ in $\Sigma_X$ being $0.6^{|j-k|}$ for $j,k=1,\cdots,p$. We generate the artificial data based on (\ref{lm}) for 1000 repetition with  $\beta_i=1$ for every $i=1,\cdots,7$. After that, use the lasso, adaptive lasso, and Elastic net (set $\alpha=0.5$) methods to estimate the parameters. Finally, summarize numerical results in the following table.
+
+
+\begin{table}[!ht]
+       \huge
+     \caption{Simulation result for (c)}
+
+   \scriptsize
+
+ \centering
+  \renewcommand{\arraystretch}{0.9}
+ \begin{tabular}{c c c c c}
+ \\
+ \hline
+& $\|\Delta\beta\|_1$ & $\|\Delta\beta\|_2$ & \#S & \#FN \\
+\hline
+lasso & \\
+adaptive lasso & \\
+Elastic net ($\alpha=0.5$) & \\ 
+ \hline 
+\end{tabular}
+
+\end{table}
+
+\item[(d)] Summarize your findings for parts (b) and (c), respectively.
+
+\end{itemize}
+
+{\bf Note:} Let $\widehat{\beta}$ be the estimator, then $\Delta\beta$ is defined as $\Delta\beta = \widehat{\beta} - \beta$ with the $i$th component being $\widehat{\beta}_i - \beta_i$. Therefore, $\|\Delta\beta\|_1$ and $\|\Delta\beta\|_2$ are defined as
+\begin{itemize}
+\item $\|\Delta\beta\|_1 = \sum \limits_{i=1}^p \left| \widehat{\beta}_i - \beta_i \right|$;
+\item $\|\Delta\beta\|_2 = \sqrt{ \sum \limits_{i=1}^p \left( \widehat{\beta}_i - \beta_i \right)^2 }$.
+\end{itemize}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\clearpage
+
+\item In the class, we have discussed that the estimator of $\Theta$ can be obtained by solving
+\begin{eqnarray*}
+\Theta^{-1} - S - \lambda \Phi = 0,
+\end{eqnarray*}
+where $S$ and $\Psi$ are defined in the note.
+
+\begin{itemize}
+
+\item[(a)] Let $W$ denote the working version of $\Theta^{-1}$ such that $W \Theta = I$, where $I$ is the identity matrix. Show that
+\begin{eqnarray} \label{eq1}
+W_{11}\beta - s_{12} - \lambda \psi_{12} = 0,
+\end{eqnarray}
+where $\beta = -\frac{\theta_{12}}{\theta_{22}}$, and $\theta_{12}$, $\theta_{22}$, $s_{12}$, and $\psi_{12}$ are defined in the note.
+
+\item[(b)] Suppose that $\widehat{\beta}$ is obtained by solving (\ref{eq1}). Please show that $\widehat{\theta}_{12} = -\widehat{\beta} \cdot \widehat{\theta}_{22} $ and $\widehat{\theta}_{22} = (w_{22} - w_{12}^\top W_{11}^{-1} w_{12})^{-1}$. Also, interpret the meaning of $\widehat{\theta}_{12}$.
+
+\end{itemize}
+
+\end{enumerate}
+
+\clearpage
+
+{\bf Hint: Regarding simulation studies with 1000 repetitions.}
+
+
+In Question 2, you are asked to use simulation studies with 1000 repetitions to estimate the parameters. Specifically, based on the $k$th artificial data that are independently generated, you are able to obtain the estimator, denoted by $\widehat{\beta}^{(k)}$. As a result, with 1000 repetitions, the final estimator is given by $\widehat{\beta} = \frac{1}{1000} \sum \limits_{k=1}^{1000} \widehat{\beta}^{(k)}$.
+ 
+
+
+
+
+
+\end{document}
